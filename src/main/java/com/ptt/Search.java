@@ -13,6 +13,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.th.ThaiAnalyzer;
 import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.store.SimpleFSDirectory;
@@ -28,7 +29,7 @@ import java.sql.Connection;
 
 public class Search
 {
-    private final static Path indexDirPath   = Paths.get(System.getProperty("user.dir") + "/ptt/index");
+    private final static Path indexDirPath   = Paths.get(System.getProperty("user.dir") + "/ptt/index2");
     private static Connection connection     = null;
     private static Analyzer analyzer         = null;
     private static Directory indexDir        = null;
@@ -42,8 +43,10 @@ public class Search
         throws Exception
     {
         setUp();
-        crawler = new Crawler(searcherManager, indexWriter, connection);
-        crawler.crawl();
+        //crawler = new Crawler(searcherManager, indexWriter, connection);
+        //crawler.crawl();
+        Write write = new Write(searcherManager, indexWriter, connection);
+        write.write();
         search();
     }
 
@@ -52,8 +55,11 @@ public class Search
     {
         indexDir                      = FSDirectory.open(indexDirPath);
         //indexDir                      = new RAMDirectory();
-        analyzer                      = new SmartChineseAnalyzer(true);
+        //analyzer                      = new SmartChineseAnalyzer(true);
+        analyzer                      = new ThaiAnalyzer();
         IndexWriterConfig indexConfig = new IndexWriterConfig(analyzer);
+        indexConfig.setRAMBufferSizeMB(2.0f);
+        indexConfig.setCommitOnClose(true);
         indexWriter                   = new IndexWriter(indexDir, indexConfig);
         searcherManager               = new SearcherManager(indexWriter, true, true, null);
         nrtReopenThread               = new ControlledRealTimeReopenThread<IndexSearcher>(indexWriter, searcherManager, 1.0, 0.1);
@@ -74,7 +80,7 @@ public class Search
         String keyword = null;
 
         while(!(keyword = buf.readLine()).equals(":q")){
-            System.out.println(String.format("查詢中(%d筆)", crawler.getCurrentPageId()));
+            //System.out.println(String.format("查詢中(%d筆)", crawler.getCurrentPageId()));
             Query query = new QueryParser("title", analyzer).parse(keyword);
             indexSearcher = searcherManager.acquire();
             TopDocs docs = indexSearcher.search(query, 10);

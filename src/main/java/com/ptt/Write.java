@@ -24,6 +24,7 @@ public class Write
         this.searcherManager = searcherManager;
         this.indexWriter = indexWriter;
         this.connection = connection;
+        shutdownhook();
     }
 
     public void write()
@@ -31,6 +32,7 @@ public class Write
         Runnable task = () -> {
             try {
                 ResultSet result = Sqlite.execStmt(connection, "select title, pdate, author, rating, href from PTT;");
+                int indexCount = 0;
                 while(result.next())
                 {
                     String title  = result.getString(1);
@@ -40,6 +42,9 @@ public class Write
                     String href   = result.getString(5);
                     addDoc(title, pdate, author, rating, href);
                     searcherManager.maybeRefresh();
+                    if((indexCount++)%100 == 0) {
+                        System.out.println("當前索引數=" + indexCount);
+                    }
                 }
             } catch(Exception e) {
                 e.printStackTrace();
@@ -61,5 +66,18 @@ public class Write
         doc.add(new StringField("href", href, Field.Store.YES));
         indexWriter.addDocument(doc);
     }
+    
+    private void shutdownhook()
+    {
+        Runnable task = ()-> {
+            try {
+                indexWriter.close();
+            } catch(java.io.IOException e) {
+                e.printStackTrace();
+            }
+        };
+        Runtime.getRuntime().addShutdownHook(new Thread(task));
+    }
+
 
 }
