@@ -36,6 +36,14 @@
             <version>6.5.0</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-suggest -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-suggest</artifactId>
+            <version>6.5.0</version>
+        </dependency>
+
+
         <!--
             PTT dependencies scope
         -->
