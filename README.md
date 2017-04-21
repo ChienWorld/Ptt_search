@@ -3,15 +3,17 @@
 This is a free software project, feel free to fork.
 Lucene based search engine for searching [PTT](https://www.ptt.cc/bbs/Gossiping/index.html) website. (Gossiping for current)
 
-* search
+#### search
 ![](http://i.imgur.com/zE3ozKG.gif)
 
-* spellcheck
+
+#### spellcheck
 ![](https://media.giphy.com/media/xUA7b0QcnHG8z50SKk/giphy.gif)
 
 ### Requirement
 * java 8
 * maven
+
 
 ### How to run ?
 maven run
